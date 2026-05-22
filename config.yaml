@@ -1,0 +1,109 @@
+# ─────────────────────────────────────────────────────────
+#  Manufacturing Process Dashboard – Configuration
+# ─────────────────────────────────────────────────────────
+
+# ── Historian connection ──────────────────────────────────
+historian:
+  # Supported types: csv | odbc | osisoft_pi | opcua | rest
+  type: csv
+
+  # --- CSV (dev / fallback) ---
+  csv_path: process_data.csv
+
+  # --- ODBC (SQL Server, Oracle, Aspen IP21, etc.) ---
+  # type: odbc
+  # connection_string: "DSN=Historian;UID=reader;PWD=secret"
+  # query: >
+  #   SELECT timestamp AS Time, Temperature, Pressure, FlowRate
+  #   FROM dbo.ProcessTag
+  #   WHERE timestamp >= ? AND timestamp < ?
+  #   ORDER BY timestamp
+
+  # --- OSIsoft PI via PI Web API ---
+  # type: osisoft_pi
+  # base_url: https://pi-server.company.com/piwebapi
+  # username: piuser
+  # password: pipass          # prefer env var: PI_PASSWORD
+  # verify_ssl: true
+  # tags:
+  #   Temperature: PI:TAG.TEMPERATURE
+  #   Pressure:    PI:TAG.PRESSURE
+  #   FlowRate:    PI:TAG.FLOWRATE
+
+  # --- OPC-UA ---
+  # type: opcua
+  # endpoint: opc.tcp://opcserver.company.com:4840
+  # username: opcuser
+  # password: opcpass          # prefer env var: OPC_PASSWORD
+  # node_ids:
+  #   Temperature: "ns=2;s=Plant.Temperature"
+  #   Pressure:    "ns=2;s=Plant.Pressure"
+  #   FlowRate:    "ns=2;s=Plant.FlowRate"
+
+  # --- Generic REST API ---
+  # type: rest
+  # url: https://api.company.com/process/data
+  # headers:
+  #   Authorization: "Bearer <token>"    # prefer env var: REST_TOKEN
+  # params:
+  #   format: json
+
+
+# ── Scheduler (data harvesting) ───────────────────────────
+scheduler:
+  # How often to pull fresh data from the historian (seconds)
+  interval_seconds: 60
+  # How many hours of history to keep in the local buffer
+  retention_hours: 72
+  # SQLite file for local buffer
+  db_path: process_buffer.db
+
+
+# ── Streamlit display ─────────────────────────────────────
+display:
+  # Auto-refresh interval for the browser (seconds)
+  # Set to 0 to disable auto-refresh
+  refresh_seconds: 30
+  # Default variable shown on load
+  default_variable: Temperature
+  # Default SPC rules checked
+  default_rules:
+    - 3-sigma
+    - 8-consecutive-one-side
+
+
+# ── SPC thresholds (optional overrides; else computed from data) ──
+# spc_overrides:
+#   Temperature:
+#     ucl: 105.0
+#     lcl:  95.0
+#   Pressure:
+#     ucl: 55.0
+#     lcl: 45.0
+
+
+# ── Alerting ─────────────────────────────────────────────
+alerting:
+  # Minimum minutes between repeated alerts for the same variable
+  cooldown_minutes: 15
+
+  email:
+    enabled: false
+    smtp_host: smtp.company.com
+    smtp_port: 587
+    use_tls: true
+    sender: dashboard@company.com
+    password: ""             # prefer env var: EMAIL_PASSWORD
+    recipients:
+      - ops.manager@company.com
+      - quality@company.com
+
+  teams:
+    enabled: false
+    # Microsoft Teams Incoming Webhook URL
+    webhook_url: ""          # prefer env var: TEAMS_WEBHOOK_URL
+
+  slack:
+    enabled: false
+    # Slack Incoming Webhook URL
+    webhook_url: ""          # prefer env var: SLACK_WEBHOOK_URL

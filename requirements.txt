@@ -1,0 +1,18 @@
+# ── Core ──────────────────────────────────────────────────
+streamlit>=1.35.0
+pandas>=2.0.0
+plotly>=5.20.0
+pyyaml>=6.0
+
+# ── Historian connectors (install only what you need) ─────
+requests>=2.31.0          # osisoft_pi  and  rest
+# pyodbc>=5.1.0           # odbc  (also needs OS-level ODBC driver)
+# opcua>=0.98.13          # opcua  (synchronous client)
+# asyncua>=1.1.0          # opcua  (async alternative)
+
+# ── Alert channels ────────────────────────────────────────
+# No extra packages needed: email via stdlib smtplib,
+# Teams/Slack via stdlib urllib.request
+
+# ── Chart export ──────────────────────────────────────────
+kaleido>=0.2.1            # required for fig.to_image() PNG export
